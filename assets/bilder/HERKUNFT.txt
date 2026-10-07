@@ -1,0 +1,18 @@
+Bilder dieser Seite: Herkunft, Lizenz, Verarbeitung (Stand 06.10.2026, Layout-Platzhalter)
+
+Alle Bilder sind Platzhalter fuer die Layout-Ansicht und vor dem Livegang durch eigene, echte Fotos zu ersetzen.
+Verarbeitung auf der Seite: Graustufen und Screen-Blend per CSS, die Dateien selbst sind unveraendert.
+
+leistung-allgemein.jpg   Pexels (diverse Fotografen), Pexels-Lizenz: kostenlos, Namensnennung nicht verpflichtend
+leistung-elektro.jpg     Pexels (diverse Fotografen), Pexels-Lizenz
+leistung-gebraucht.jpg   Pexels (diverse Fotografen), Pexels-Lizenz
+leistung-oldtimer.jpg    Pexels (diverse Fotografen), Pexels-Lizenz
+leistung-unfall.jpg      Pexels (diverse Fotografen), Pexels-Lizenz
+
+stadt-muelheim.jpg       Aquarius Wassermuseum, Tuxyso / Wikimedia Commons, CC BY-SA 3.0 (Nennung Pflicht)
+stadt-essen.jpg          Zeche Zollverein, Thomas Wolf, www.foto-tw.de, Wikimedia Commons, CC BY-SA 3.0 DE (Nennung Pflicht)
+stadt-duisburg.jpg       Landschaftspark Duisburg-Nord, Dietmar Rabich / Wikimedia Commons, CC BY-SA 4.0 (Nennung Pflicht)
+stadt-oberhausen.jpg     Gasometer, Raimond Spekking / Wikimedia Commons, CC BY-SA 4.0 (Nennung Pflicht)
+
+Die Nennungen der Wikimedia-Bilder stehen als Bildunterschrift auf den Ortsseiten (Quelle: bauen.py, STAEDTE).
+Einzelne Pexels-Urheber sind hier nicht erfasst; vor dem Livegang pruefen oder Bilder ersetzen (LEGAL-REVIEW).

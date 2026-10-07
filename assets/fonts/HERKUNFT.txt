@@ -1,0 +1,7 @@
+Schriften dieser Seite, selbst gehostet (keine Verbindung zu Google oder anderen Fremdservern)
+
+archivo-latin-wdth.woff2    Archivo (variabel: Gewicht 100-900, Breite 62-125 %), SIL OFL 1.1, Lizenz: OFL-Archivo.txt
+inconsolata-regular.woff2   Inconsolata Regular, SIL OFL 1.1, Lizenz: OFL-Inconsolata.txt
+
+Beide Dateien wurden aus bereits auf diesem Rechner vorhandenen Projekten uebernommen
+(zeca-alu-de bzw. mitgelieferte Schriftdateien), nicht aus dem Netz geladen.

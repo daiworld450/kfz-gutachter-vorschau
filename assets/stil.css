@@ -1,0 +1,597 @@
+/* ============================================================
+   Kfz-Sachverständigenbüro · Schaublatt
+   ------------------------------------------------------------
+   Eine Aufzeichnung auf hellem Diagrammpapier: eine Tinte,
+   ein Rot für Ereignis und Anruf, Ablesungen statt Behauptungen.
+   Schriften selbst gehostet (assets/fonts, SIL OFL), keine
+   Verbindung zu Fremdservern. Eine Datei, keine Bibliothek.
+   Entwurf 05.10.2026, ersetzt den dunklen Automotive-Look.
+   ============================================================ */
+
+@font-face{
+  font-family:'Archivo';font-style:normal;font-weight:100 900;font-stretch:62% 125%;font-display:swap;
+  src:url('fonts/archivo-latin-wdth.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122;
+}
+@font-face{
+  font-family:'Inconsolata';font-style:normal;font-weight:400;font-display:swap;
+  src:url('fonts/inconsolata-regular.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122;
+}
+
+:root{
+  /* Diagrammpapier und Tinte */
+  --papier:#F3F6F2;
+  --papier-2:#E6ECE6;
+  --blatt:#FBFCFA;
+  --tinte:#0E2B24;
+  --tinte-2:#3A544B;
+  --linie:#6E8A7D;          /* tragende Linien: 3:1 gegen Papier */
+  --linie-fein:#C3D2C9;     /* Teilungen, Trennlinien ohne Funktion */
+  --tinte-hell:#B9CEC4;     /* Zweitschrift auf Tinte, 9:1 */
+  /* Schreibrot: nur Ereignis und Anruf */
+  --rot:#C4261A;
+  --rot-tief:#A41D12;
+  --gut:#1F6B52;
+  --warnung:#A41D12;
+
+  --f-kopf:'Archivo','Arial Narrow','Helvetica Neue',Arial,sans-serif;
+  --f-text:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --f-mess:'Inconsolata',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --ease-aus:cubic-bezier(.23,1,.32,1);
+  --ease-lade:cubic-bezier(.32,.72,0,1);
+
+  --spur:clamp(16px,4vw,48px);   /* seitlicher Rand */
+  --breite:1280px;
+  --kopf-hoehe:64px;
+  --eck:2px;
+  --ziel:44px;                   /* kleinste Tippfläche */
+  --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.5rem;--s6:2rem;--s7:3rem;--s8:4rem;--s9:6rem;
+  --abschnitt:clamp(4rem,9vw,8rem);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;
+  scroll-behavior:smooth;scroll-padding-top:calc(var(--kopf-hoehe) + 1.5rem);
+  color-scheme:light;accent-color:var(--rot);
+  scrollbar-color:var(--linie) var(--papier);
+}
+main:focus{outline:none}
+body{
+  margin:0;background:var(--papier);color:var(--tinte);
+  font-family:var(--f-text);font-size:1.0625rem;line-height:1.62;font-stretch:100%;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-wrap:break-word;
+}
+body.mit-fussleiste{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+@media(min-width:1080px){body.mit-fussleiste{padding-bottom:0}}
+img,svg,canvas{max-width:100%;display:block}
+a{color:inherit;text-underline-offset:.18em;text-decoration-thickness:1px}
+h1,h2,h3,h4{margin:0;text-wrap:balance;font-family:var(--f-kopf);font-stretch:78%;font-weight:760;letter-spacing:-.012em;line-height:1.2}
+p{margin:0 0 1em;max-width:64ch;text-wrap:pretty}
+ul,ol{margin:0;padding:0}
+button,input,select,textarea{font:inherit;color:inherit}
+::selection{background:var(--tinte);color:var(--papier)}
+.mitte{max-width:var(--breite);margin:0 auto;padding:0 var(--spur)}
+.eng > *{max-width:880px}
+.nur-screenreader{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* -------- Fokus: ein Ring in Tinte, auf Tinte in Papier -------- */
+:focus-visible{outline:3px solid var(--tinte);outline-offset:3px;border-radius:var(--eck)}
+.negativ :focus-visible,.fuss :focus-visible,.fussleiste :focus-visible{outline-color:var(--papier)}
+a.skip-link{position:fixed;left:12px;top:-80px;z-index:300;background:var(--tinte);color:var(--papier);
+  padding:14px 20px;border-radius:var(--eck);font-weight:700;text-decoration:none;transition:top .15s var(--ease-aus)}
+a.skip-link:focus{top:12px}
+
+/* -------- Platzhalter: ein Schreibfeld, kein Fehler -------- */
+.ph{
+  font-family:var(--f-mess);font-size:.94em;font-weight:400;letter-spacing:0;color:var(--tinte-2);
+  border-bottom:2px dotted var(--linie);padding:0 .12em;
+}
+a .ph{border-bottom:0;padding:0;color:inherit}
+h1 .ph,h2 .ph,h3 .ph{font-size:.72em}
+.negativ .ph,.fuss .ph,.fussleiste .ph,.notleiste .ph{color:var(--tinte-hell);border-bottom-color:var(--tinte-hell)}
+
+/* ============================================================
+   Typografie
+   ============================================================ */
+h1.gross{font-size:clamp(2.75rem,5.6vw,5rem);font-stretch:74%;font-weight:820;line-height:1.04;letter-spacing:-.01em;word-spacing:.06em}
+h2.gross{font-size:clamp(2rem,4.6vw,3.75rem);font-stretch:76%;font-weight:800;line-height:1.06;max-width:19ch;word-spacing:.06em}
+h3.mittel{font-size:1.3rem;font-stretch:84%;line-height:1.2}
+.vor{font-size:clamp(1.125rem,1.5vw,1.3125rem);line-height:1.5;color:var(--tinte-2);max-width:46ch;margin-top:var(--s5)}
+.text-2{color:var(--tinte-2)}
+.klein{font-size:.9375rem}
+.mess{font-family:var(--f-mess);font-size:.9375rem;letter-spacing:0}
+
+/* ============================================================
+   Knöpfe: ein roter Anruf, alles andere Tinte
+   ============================================================ */
+.knopf{
+  display:inline-flex;align-items:center;justify-content:center;gap:.65rem;min-height:52px;
+  padding:0 1.6rem;border:2px solid var(--rot);border-radius:var(--eck);background:var(--rot);color:#fff;
+  font-family:var(--f-kopf);font-stretch:88%;font-weight:700;font-size:1.0625rem;line-height:1;letter-spacing:.005em;
+  text-decoration:none;white-space:nowrap;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;
+  transition:transform 120ms var(--ease-aus),background-color 160ms ease,color 160ms ease,border-color 160ms ease;
+}
+.knopf:active{transform:scale(.97)}
+.knopf svg{width:20px;height:20px;flex:0 0 auto}
+.knopf.rand{background:transparent;border-color:var(--tinte);color:var(--tinte)}
+.knopf.klein{min-height:var(--ziel);padding:0 1.15rem;font-size:.9375rem}
+.knopf.block{width:100%}
+.negativ .knopf{border-color:var(--papier)}
+.negativ .knopf.rand{background:transparent;color:var(--papier)}
+@media(hover:hover) and (pointer:fine){
+  .knopf:hover{background:var(--rot-tief);border-color:var(--rot-tief)}
+  .knopf.rand:hover{background:var(--tinte);color:var(--papier);border-color:var(--tinte)}
+  .negativ .knopf:hover{background:var(--rot-tief);border-color:var(--papier)}
+  .negativ .knopf.rand:hover{background:var(--papier);color:var(--tinte)}
+}
+.textlink{display:inline-flex;align-items:center;gap:.5rem;min-height:var(--ziel);font-family:var(--f-kopf);font-stretch:88%;font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.28em}
+.textlink svg{width:18px;height:18px;transition:transform 160ms var(--ease-aus)}
+@media(hover:hover) and (pointer:fine){.textlink:hover svg{transform:translateX(4px)}}
+.knoepfe{display:flex;flex-wrap:wrap;gap:var(--s3)}
+@media(max-width:560px){.titeltext .knoepfe,.kopftext .knoepfe{flex-direction:column;align-items:stretch}}
+.abstand{margin-top:var(--s6)}
+
+/* ============================================================
+   Notzeile (nur Desktop) und Kopf
+   ============================================================ */
+.notleiste{display:none;background:var(--tinte);color:var(--papier);font-size:.9375rem}
+@media(min-width:1080px){.notleiste{display:block}}
+.notleiste .mitte{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s6);align-items:center;justify-content:space-between;min-height:var(--ziel)}
+.notleiste a{font-weight:700;text-decoration:underline;display:inline-flex;align-items:center;min-height:var(--ziel)}
+.notleiste .leise{color:var(--tinte-hell)}
+
+header.kopf{
+  position:sticky;top:0;z-index:100;background:var(--papier);border-bottom:2px solid var(--tinte);
+  height:var(--kopf-hoehe);display:flex;align-items:center;padding-top:env(safe-area-inset-top,0px);
+}
+@media(min-width:1080px){header.kopf{height:72px}}
+header.kopf .mitte{display:flex;align-items:center;gap:var(--s5);width:100%}
+.marke{display:flex;align-items:center;gap:.7rem;margin-right:auto;text-decoration:none;min-height:var(--ziel)}
+.marke .zeichen{width:36px;height:36px;flex:0 0 auto;color:var(--tinte)}
+.marke .zeichen svg{width:36px;height:36px}
+.marke b{display:block;font-family:var(--f-kopf);font-stretch:80%;font-weight:800;font-size:1.1875rem;line-height:1.1;letter-spacing:-.005em}
+.marke > span > span{display:block;font-size:.875rem;color:var(--tinte-2);line-height:1.2;margin-top:2px}
+@media(max-width:520px){.marke > span > span{display:none}}
+
+nav.haupt{display:none}
+@media(min-width:1080px){
+  nav.haupt{display:flex;align-items:center;gap:.25rem;font-family:var(--f-kopf);font-stretch:90%;font-weight:600;font-size:1rem}
+  nav.haupt > a,.hat-dropdown > .dach{display:inline-flex;align-items:center;gap:.4rem;min-height:var(--ziel);padding:0 .8rem;text-decoration:none;position:relative}
+  nav.haupt > a::after,.hat-dropdown > .dach::after{content:"";position:absolute;left:.8rem;right:.8rem;bottom:6px;height:3px;background:var(--tinte);transform:scaleX(0);transform-origin:left;transition:transform 180ms var(--ease-aus)}
+  nav.haupt a[aria-current="page"]{font-weight:800}
+  nav.haupt a[aria-current="page"]::after{transform:scaleX(1)}
+  .hat-dropdown{position:relative}
+  .hat-dropdown > .dach svg{width:14px;height:14px;transition:transform 160ms var(--ease-aus)}
+  .hat-dropdown:focus-within > .dach svg{transform:rotate(180deg)}
+  .dropdown{position:absolute;top:100%;left:0;padding-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity 150ms ease,transform 150ms var(--ease-aus),visibility 0s 150ms}
+  .hat-dropdown:focus-within .dropdown{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+  .dropdown ul{list-style:none;background:var(--papier);border:2px solid var(--tinte);padding:var(--s2);min-width:300px;box-shadow:0 14px 32px rgba(14,43,36,.18)}
+  .dropdown a{display:block;padding:.65rem .8rem;text-decoration:none;font-weight:700;font-size:1rem}
+  .dropdown a span{display:block;font-weight:400;font-size:.9375rem;color:var(--tinte-2);margin-top:2px;font-family:var(--f-text);font-stretch:100%}
+}
+@media(hover:hover) and (pointer:fine) and (min-width:1080px){
+  nav.haupt > a:hover::after,.hat-dropdown:hover > .dach::after{transform:scaleX(1)}
+  .hat-dropdown:hover > .dach svg{transform:rotate(180deg)}
+  .hat-dropdown:hover .dropdown{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+  .dropdown a:hover{background:var(--tinte);color:var(--papier)}
+  .dropdown a:hover span{color:var(--tinte-hell)}
+}
+.kopf-cta{display:none}
+@media(min-width:640px){.kopf-cta{display:flex}}
+@media(min-width:1080px){.kopf-cta{margin-left:var(--s3)}}
+
+/* -------- Mobiles Menü: aus dem Fokus, solange es zu ist -------- */
+.menu-knopf{display:grid;place-items:center;width:var(--ziel);height:var(--ziel);background:none;border:2px solid var(--tinte);border-radius:var(--eck);cursor:pointer;touch-action:manipulation}
+.menu-knopf svg{width:22px;height:22px}
+.menu-knopf .zu{display:none}
+.menu-knopf[aria-expanded="true"] .auf{display:none}
+.menu-knopf[aria-expanded="true"] .zu{display:block}
+@media(min-width:1080px){.menu-knopf{display:none}}
+.mobilmenue{
+  position:fixed;inset:0;z-index:99;background:var(--papier);overflow-y:auto;overscroll-behavior:contain;
+  padding:calc(var(--kopf-hoehe) + env(safe-area-inset-top,0px) + var(--s5)) var(--spur) calc(var(--s8) + env(safe-area-inset-bottom,0px));
+  visibility:hidden;transform:translateX(100%);
+  transition:transform 280ms var(--ease-lade),visibility 0s 280ms;
+}
+.mobilmenue[data-offen="true"]{visibility:visible;transform:none;transition-delay:0s}
+@media(min-width:1080px){.mobilmenue{display:none}}
+.mobilmenue a{display:flex;align-items:center;min-height:var(--ziel);padding:.55rem 0;border-bottom:1px solid var(--linie-fein);text-decoration:none;font-family:var(--f-kopf);font-stretch:84%;font-weight:700;font-size:1.5rem}
+.mobilmenue a[aria-current="page"]{box-shadow:inset 4px 0 0 var(--tinte);padding-left:1rem}
+.mobilmenue .untermenue{padding-left:1rem;margin-bottom:var(--s3)}
+.mobilmenue .untermenue a{font-size:1.125rem;font-weight:600;font-stretch:92%;color:var(--tinte-2)}
+.mobilmenue .knoepfe{margin-top:var(--s6);display:grid;gap:var(--s3)}
+.mobilmenue .knoepfe a{font-size:1.0625rem;border-bottom:2px solid transparent;padding:0 1.6rem;border:2px solid var(--rot);justify-content:center;min-height:52px}
+.mobilmenue .knoepfe a.rand{border-color:var(--tinte)}
+
+/* -------- Feste Fußleiste (Telefon bleibt immer erreichbar) -------- */
+.fussleiste{
+  position:fixed;left:0;right:0;bottom:0;z-index:90;display:grid;grid-template-columns:1fr 1fr 1.4fr;
+  background:var(--tinte);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media(min-width:1080px){.fussleiste{display:none}}
+.fussleiste a{display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:64px;padding:0 .5rem;color:var(--papier);
+  text-decoration:none;font-family:var(--f-kopf);font-stretch:88%;font-weight:700;font-size:1rem;touch-action:manipulation;-webkit-user-select:none;user-select:none;transition:transform 120ms var(--ease-aus)}
+.fussleiste a:active{transform:scale(.97)}
+.fussleiste a svg{width:20px;height:20px;flex:0 0 auto}
+.fussleiste a span{white-space:nowrap}
+.fussleiste a.ruf{background:var(--rot)}
+.fussleiste a + a{border-left:1px solid rgba(243,246,242,.28)}
+@media(max-width:420px){.fussleiste a{font-size:.9375rem;gap:.35rem;padding:0 .25rem}.fussleiste a svg{width:18px;height:18px}}
+
+/* ============================================================
+   Brotkrumen
+   ============================================================ */
+.breadcrumb{font-size:.9375rem;color:var(--tinte-2);display:flex;flex-wrap:wrap;align-items:center;gap:0 .5rem;padding:var(--s4) 0 0}
+.breadcrumb a{display:inline-flex;align-items:center;min-height:var(--ziel);color:inherit}
+.breadcrumb span{opacity:.55}
+.breadcrumb b{font-weight:700;color:var(--tinte)}
+@media(hover:hover) and (pointer:fine){.breadcrumb a:hover{color:var(--tinte)}}
+
+/* ============================================================
+   Titelblatt: Startseite mit Schaublatt
+   ============================================================ */
+.titelblatt{padding-top:clamp(2rem,5vw,4.5rem);overflow:hidden}
+.titelraster{display:grid;gap:var(--s7) clamp(2rem,5vw,5rem);align-items:center;padding-bottom:clamp(2.5rem,6vw,5rem)}
+@media(min-width:960px){.titelraster{grid-template-columns:minmax(0,6.2fr) minmax(0,5fr)}}
+.titeltext h1{max-width:none}
+.titeltext .knoepfe{margin-top:var(--s6)}
+.schaublatt{margin:0;max-width:600px;width:100%;justify-self:center}
+.schaublatt svg{width:100%;height:auto;overflow:visible}
+.schaublatt figcaption{margin-top:var(--s3);font-size:.9375rem;color:var(--tinte-2);text-align:center}
+@media(max-width:959px){.schaublatt{max-width:440px}}
+
+/* Schaublatt-Zeichnung: eine Tinte, drei Linienstärken */
+.sb-blatt{fill:var(--blatt);stroke:var(--tinte);stroke-width:2}
+.sb-ring{fill:none;stroke:var(--linie);stroke-width:1}
+.sb-ring.stark{stroke:var(--tinte);stroke-width:1.5}
+.sb-teil{stroke:var(--tinte);stroke-width:1.25;fill:none}
+.sb-fein{stroke:var(--linie-fein);stroke-width:.75;fill:none}
+.sb-spur{fill:none;stroke:var(--tinte);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+.sb-weg{fill:none;stroke:var(--tinte);stroke-width:1.25;stroke-linejoin:round}
+.sb-ereignis{fill:none;stroke:var(--rot);stroke-width:4;stroke-linecap:round}
+.sb-punkt{fill:var(--rot)}
+.sb-zahl{font-family:var(--f-mess);font-size:17px;fill:var(--tinte)}
+.sb-wort{font-family:var(--f-kopf);font-stretch:84%;font-weight:760;font-size:19px;fill:var(--rot);paint-order:stroke;stroke:var(--blatt);stroke-width:6px}
+.sb-nabe{fill:var(--blatt);stroke:var(--tinte);stroke-width:2}
+.sb-teil.gross{stroke-width:2.25}
+.sb-teil.gestrichelt{stroke-dasharray:3 6;stroke-width:1.25}
+.sb-lese{fill:none;stroke:var(--rot);stroke-width:1.25;stroke-dasharray:3 4}
+.ek-code{font-family:var(--f-kopf);font-stretch:70%;font-weight:850;font-size:30px;fill:var(--tinte);paint-order:stroke;stroke:var(--papier);stroke-width:7px;stroke-linejoin:round}
+.ek-ort{font-family:var(--f-text);font-size:17px;fill:var(--tinte-2);paint-order:stroke;stroke:var(--papier);stroke-width:6px;stroke-linejoin:round}
+
+/* ============================================================
+   Kopfblatt: Unterseiten
+   ============================================================ */
+.kopfblatt{padding-bottom:clamp(2.5rem,6vw,5rem);border-bottom:2px solid var(--tinte)}
+.kopfraster{display:grid;gap:var(--s6) clamp(2rem,5vw,4.5rem);align-items:center;padding-top:clamp(1.5rem,3.5vw,3rem)}
+@media(min-width:960px){.kopfraster.mit-foto{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+.kopfblatt h1{max-width:14ch}
+.kopfblatt .knoepfe{margin-top:var(--s6)}
+
+/* -------- Fotos als Einfarbdruck in Tinte: Layout-Platzhalter -------- */
+.druckfoto{margin:0}
+.druckfoto .rahmen{position:relative;overflow:hidden;background:var(--tinte);aspect-ratio:4/3}
+.druckfoto img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.12) brightness(.92);mix-blend-mode:screen}
+.druckfoto figcaption{margin-top:var(--s2);font-size:.9375rem;color:var(--tinte-2);max-width:60ch}
+.ortscode{
+  position:absolute;left:0;bottom:0;padding:.35rem 1rem .5rem;background:var(--papier);color:var(--tinte);
+  font-family:var(--f-kopf);font-stretch:70%;font-weight:850;font-size:clamp(2.5rem,5vw,4rem);line-height:1;letter-spacing:.01em
+}
+
+/* ============================================================
+   Abschnitte und Bänder
+   ============================================================ */
+section{padding:var(--abschnitt) 0}
+section.band{background:var(--papier-2)}
+section.negativ,.negativ{background:var(--tinte);color:var(--papier)}
+.negativ .vor,.negativ .text-2,.negativ p{color:var(--tinte-hell)}
+.negativ h1,.negativ h2,.negativ h3,.negativ b{color:var(--papier)}
+.kopfzeile{max-width:60ch;margin-bottom:clamp(2rem,4.5vw,3.5rem)}
+.kopfzeile .vor{margin-top:var(--s4)}
+
+/* -------- Kennzeile unter dem Titelblatt -------- */
+.kennzeile{border-top:2px solid var(--tinte);border-bottom:1px solid var(--linie-fein)}
+.kennzeile ul{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);max-width:var(--breite);margin:0 auto;padding:0 var(--spur)}
+@media(min-width:900px){.kennzeile ul{grid-template-columns:repeat(4,1fr)}}
+.kennzeile li{padding:var(--s4) var(--s4) var(--s4) 0;font-family:var(--f-kopf);font-stretch:88%;font-weight:700;font-size:1.0625rem;line-height:1.3}
+@media(min-width:900px){.kennzeile li + li{padding-left:var(--s5);border-left:1px solid var(--linie-fein)}}
+@media(max-width:899px){.kennzeile li:nth-child(even){padding-left:var(--s4);border-left:1px solid var(--linie-fein)}.kennzeile li:nth-child(n+3){border-top:1px solid var(--linie-fein)}}
+
+/* ============================================================
+   Zeitachse (Ablauf): Teilung mit vier Stationen
+   ============================================================ */
+.prozess{list-style:none;display:grid;gap:var(--s7) var(--s6);counter-reset:station;position:relative}
+@media(min-width:860px){
+  .prozess{grid-template-columns:repeat(4,1fr);padding-top:var(--s7)}
+  .prozess::before{content:"";position:absolute;left:0;right:0;top:0;height:22px;border-top:2px solid var(--tinte);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10'%3E%3Crect width='1.5' height='10' fill='%230E2B24'/%3E%3C/svg%3E") 0 0/12px 10px repeat-x,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='22' viewBox='0 0 100 22' preserveAspectRatio='none'%3E%3Crect width='.6' height='22' fill='%230E2B24'/%3E%3C/svg%3E") 0 0/25% 22px repeat-x}
+}
+.prozess > li{position:relative;counter-increment:station;padding-top:var(--s5);border-top:2px solid var(--tinte)}
+@media(min-width:860px){.prozess > li{border-top:0;padding-top:0;padding-right:var(--s3)}}
+.prozess .nr{display:block;font-family:var(--f-kopf);font-stretch:68%;font-weight:850;font-size:clamp(3.5rem,6vw,5rem);line-height:.9;color:var(--tinte);margin-bottom:var(--s3)}
+.prozess h3{font-size:1.4rem;margin-bottom:var(--s2)}
+.prozess p{font-size:1rem;color:var(--tinte-2);margin:0;max-width:30ch}
+.negativ .prozess p{color:var(--tinte-hell)}
+.negativ .prozess > li{border-color:var(--papier)}
+.negativ .prozess .nr{color:var(--papier)}
+
+/* ============================================================
+   Merkmale: Ablesungen ohne Piktogramm
+   ============================================================ */
+.merkmale-raster{display:grid;gap:0 var(--s7);margin-top:var(--s6)}
+@media(min-width:760px){.merkmale-raster{grid-template-columns:repeat(2,1fr)}}
+.merkmal{padding:var(--s5) 0 var(--s6);border-top:2px solid var(--tinte)}
+.merkmal h3{font-size:1.5rem;margin-bottom:var(--s2);max-width:22ch}
+.merkmal p{margin:0;color:var(--tinte-2);max-width:48ch}
+.band .merkmal{border-top-color:var(--tinte)}
+.negativ .merkmal{border-top-color:var(--papier)}
+
+/* ============================================================
+   Register: die Leistungen als Inhaltsverzeichnis
+   ============================================================ */
+.register{list-style:none;border-top:2px solid var(--tinte);margin-top:var(--s6)}
+.register li{border-bottom:1px solid var(--linie)}
+.register a{
+  display:grid;grid-template-columns:1fr auto;gap:var(--s2) var(--s5);align-items:center;
+  padding:var(--s5) 0;text-decoration:none;min-height:var(--ziel);
+}
+@media(min-width:900px){.register a{margin-inline:calc(-1*var(--s3))}}
+@media(min-width:900px){.register a{grid-template-columns:minmax(0,5fr) minmax(0,6fr) auto;gap:var(--s6);padding:var(--s5) var(--s3)}}
+.register .titel{font-family:var(--f-kopf);font-stretch:78%;font-weight:800;font-size:clamp(1.75rem,3.4vw,2.75rem);line-height:1.06;word-spacing:.06em}
+.register .text{color:var(--tinte-2);grid-column:1/2;max-width:52ch}
+@media(min-width:900px){.register .text{grid-column:auto}}
+.register .pfeil{grid-column:2/3;grid-row:1/3;width:28px;height:28px;transition:transform 180ms var(--ease-aus)}
+@media(min-width:900px){.register .pfeil{grid-column:auto;grid-row:auto}}
+@media(hover:hover) and (pointer:fine){
+  .register a{transition:background-color 160ms ease,color 160ms ease}
+  .register a:hover{background:var(--tinte);color:var(--papier)}
+  .register a:hover .text{color:var(--tinte-hell)}
+  .register a:hover .pfeil{transform:translateX(6px)}
+}
+
+/* ============================================================
+   Sofort: was jetzt zu tun ist (Startseite)
+   ============================================================ */
+.sofort{display:grid;gap:var(--s6) clamp(2rem,6vw,6rem)}
+@media(min-width:900px){.sofort{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}}
+.sofort .kopfzeile{margin-bottom:0}
+.sofort-liste{list-style:none;counter-reset:sofort;border-top:2px solid var(--tinte)}
+.sofort-liste li{
+  counter-increment:sofort;display:grid;grid-template-columns:3.5rem 1fr;gap:var(--s3);align-items:center;
+  padding:var(--s4) 0;border-bottom:1px solid var(--linie);
+  font-family:var(--f-kopf);font-stretch:88%;font-weight:650;font-size:clamp(1.2rem,2.2vw,1.55rem);line-height:1.3;
+}
+.sofort-liste li::before{content:counter(sofort);font-stretch:66%;font-weight:850;font-size:2.75rem;line-height:1}
+
+/* ============================================================
+   Orte: Einsatzgebiet mit Kennzeichen-Kürzeln
+   ============================================================ */
+.orte{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);border-top:2px solid var(--tinte)}
+.orte li{border-bottom:1px solid var(--linie)}
+.orte li:nth-child(even){border-left:1px solid var(--linie)}
+@media(min-width:760px){.orte{grid-template-columns:repeat(4,1fr)}.orte li{border-bottom:0}.orte li + li{border-left:1px solid var(--linie)}}
+.orte a{display:grid;gap:var(--s1);padding:var(--s5) var(--s3);text-decoration:none;min-height:var(--ziel);align-content:start}
+.orte li:nth-child(odd) a{padding-left:0}
+@media(min-width:760px){.orte a{padding:var(--s5) var(--s4) var(--s6) var(--s4)}.orte li:first-child a{padding-left:0}}
+.orte .kz{font-family:var(--f-kopf);font-stretch:66%;font-weight:850;font-size:clamp(3.5rem,8vw,6.5rem);line-height:.9;letter-spacing:.005em}
+.orte b{font-family:var(--f-kopf);font-stretch:84%;font-weight:760;font-size:1.25rem;line-height:1.15}
+.orte small{font-size:.9375rem;color:var(--tinte-2)}
+@media(hover:hover) and (pointer:fine){
+  .orte a{transition:background-color 160ms ease}
+  .orte a:hover{background:var(--papier-2)}
+}
+
+/* ============================================================
+   Aussagen: Ihr Recht, Hinweise, Warnungen
+   ============================================================ */
+.recht{padding:var(--abschnitt) 0}
+.recht .aussage-gross{font-family:var(--f-kopf);font-stretch:72%;font-weight:830;font-size:clamp(2.5rem,6.4vw,5.5rem);line-height:1.04;letter-spacing:-.01em;max-width:21ch;margin:0;word-spacing:.06em}
+.recht .quelle{margin:var(--s6) 0 0;font-size:1.125rem;max-width:56ch}
+.recht .quelle a{display:inline-flex;align-items:center;min-height:var(--ziel);font-weight:700}
+
+.aussage,.merkzettel{padding:var(--s4) 0 var(--s2);margin:var(--s6) 0;max-width:70ch}
+.aussage{background:var(--blatt);border:2px solid var(--tinte);padding:var(--s5)}
+.aussage b,.merkzettel b{display:block;font-family:var(--f-kopf);font-stretch:84%;font-weight:760;font-size:1.3rem;line-height:1.2;margin-bottom:var(--s2)}
+.aussage p,.merkzettel p{margin:0 0 .75em;max-width:none}
+.aussage p:last-child,.merkzettel p:last-child{margin-bottom:0}
+.aussage.ruhig{border-width:1px;border-color:var(--linie)}
+.aussage.gut{border-width:3px}
+.aussage:not(.ruhig):not(.gut){border-width:3px}
+.aussage:not(.ruhig):not(.gut) b{color:var(--rot-tief)}
+.merkzettel{border-top-width:4px;background:var(--papier-2);padding:var(--s5);margin-top:var(--s7)}
+.negativ .aussage{background:transparent;border-color:var(--papier)}
+.negativ .merkzettel{background:rgba(243,246,242,.08)}
+
+/* ============================================================
+   FAQ: Zeilen, kein Akkordeon-Kasten
+   ============================================================ */
+.fragen{border-top:2px solid var(--tinte)}
+details{border-bottom:1px solid var(--linie)}
+summary{
+  cursor:pointer;list-style:none;position:relative;min-height:56px;display:flex;align-items:center;
+  padding:var(--s4) 3.25rem var(--s4) 0;font-family:var(--f-kopf);font-stretch:88%;font-weight:700;font-size:1.25rem;line-height:1.3;touch-action:manipulation;
+}
+summary::-webkit-details-marker{display:none}
+summary::before,summary::after{content:"";position:absolute;right:.4rem;top:50%;width:18px;height:2px;background:var(--tinte);transition:transform 180ms var(--ease-aus)}
+summary::after{transform:rotate(90deg)}
+details[open] summary::after{transform:rotate(0)}
+details .antwort{padding:0 0 var(--s5);color:var(--tinte-2);max-width:66ch}
+details .antwort p:last-child{margin:0}
+@media(hover:hover) and (pointer:fine){summary:hover{background:var(--papier-2)}}
+.faq-cta{margin-top:var(--s7);padding:var(--s5) 0 0;border-top:2px solid var(--tinte);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s4)}
+.faq-cta b{font-family:var(--f-kopf);font-stretch:84%;font-size:1.4rem}
+
+/* ============================================================
+   Positionen (Unfallgutachten) und Prüfumfang
+   ============================================================ */
+.technik-raster{display:grid;gap:0 var(--s6);margin-top:var(--s6);counter-reset:pos}
+@media(min-width:680px){.technik-raster{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1080px){.technik-raster{grid-template-columns:repeat(4,1fr)}}
+.technik-punkt{padding:var(--s4) 0 var(--s5);border-top:2px solid var(--tinte);counter-increment:pos}
+.technik-punkt h3{font-size:1.25rem;font-stretch:84%;margin:0 0 var(--s2)}
+.technik-punkt p{font-size:1rem;color:var(--tinte-2);margin:0;max-width:none}
+.nummeriert .technik-punkt h3::before{content:counter(pos);display:block;font-family:var(--f-kopf);font-stretch:66%;font-weight:850;font-size:3rem;line-height:1;margin-bottom:var(--s2)}
+
+/* ============================================================
+   Fließtext, Listen, Tabellen
+   ============================================================ */
+ul.haken{list-style:none;margin:0 0 var(--s5);display:grid;gap:var(--s3);max-width:64ch}
+ul.haken li{padding-left:2rem;position:relative;color:var(--tinte-2)}
+ul.haken li::before{content:"";position:absolute;left:.15rem;top:.5em;width:14px;height:8px;border-left:2.5px solid var(--tinte);border-bottom:2.5px solid var(--tinte);transform:rotate(-45deg)}
+ul.haken li b{color:var(--tinte)}
+.inhalt h2:not(.gross){font-size:clamp(1.75rem,3.2vw,2.5rem);font-stretch:78%;margin:var(--s8) 0 var(--s4)}
+.inhalt h2:not(.gross):first-child{margin-top:0}
+.inhalt h3{margin:var(--s6) 0 var(--s2);font-size:1.3rem}
+.inhalt ol,.inhalt ul:not(.haken){max-width:64ch;padding-left:1.4em;color:var(--tinte-2)}
+.inhalt li{margin:0 0 .6rem}
+.tabellenrahmen{overflow-x:auto;margin:var(--s5) 0;border-top:2px solid var(--tinte);border-bottom:1px solid var(--linie)}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:1rem}
+th,td{text-align:left;padding:.8rem 1rem .8rem 0;border-bottom:1px solid var(--linie-fein);vertical-align:top}
+th{font-family:var(--f-kopf);font-stretch:84%;font-weight:700;color:var(--tinte);font-size:1rem}
+tr:last-child td{border-bottom:none}
+
+/* ============================================================
+   Referenzen: leere Blätter statt erfundener Fälle
+   ============================================================ */
+.filter-leiste{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s6) 0}
+.filter-leiste button{
+  min-height:var(--ziel);padding:0 1.1rem;background:transparent;border:2px solid var(--tinte);border-radius:var(--eck);cursor:pointer;
+  font-family:var(--f-kopf);font-stretch:88%;font-weight:700;font-size:1rem;touch-action:manipulation;-webkit-user-select:none;user-select:none;
+  transition:background-color 160ms ease,color 160ms ease,transform 120ms var(--ease-aus);
+}
+.filter-leiste button:active{transform:scale(.97)}
+.filter-leiste button[aria-pressed="true"]{background:var(--tinte);color:var(--papier)}
+@media(hover:hover) and (pointer:fine){.filter-leiste button[aria-pressed="false"]:hover{background:var(--papier-2)}}
+.faelle-raster{display:grid;gap:var(--s5)}
+@media(min-width:680px){.faelle-raster{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1080px){.faelle-raster{grid-template-columns:repeat(3,1fr)}}
+.fallkarte{border:2px dashed var(--linie);padding:var(--s5);background:var(--blatt);min-height:220px;display:grid;align-content:start;gap:var(--s3)}
+.fallkarte h3{font-size:1.4rem;font-stretch:84%}
+.fallkarte p{margin:0;max-width:none;color:var(--tinte-2)}
+.fallkarte .marke-leer{font-family:var(--f-mess);font-size:.9375rem;color:var(--tinte-2)}
+.fallkarte[hidden]{display:none}
+.zahlen-leiste{display:grid;margin-top:var(--s8);border-top:2px solid var(--tinte)}
+@media(min-width:760px){.zahlen-leiste{grid-template-columns:repeat(3,1fr)}}
+.zahlen-leiste > div{padding:var(--s5) var(--s5) var(--s5) 0;border-bottom:1px solid var(--linie)}
+@media(min-width:760px){.zahlen-leiste > div{border-bottom:0}.zahlen-leiste > div + div{border-left:1px solid var(--linie);padding-left:var(--s5)}}
+.zahlen-leiste b{display:block;font-family:var(--f-kopf);font-stretch:84%;font-weight:760;font-size:1.3rem;margin-bottom:var(--s1)}
+.zahlen-leiste span{display:block;color:var(--tinte-2);max-width:32ch}
+
+/* ============================================================
+   Kontakt: Kanäle und Formular
+   ============================================================ */
+.kanal-raster{display:grid;margin-bottom:var(--s8);border-top:2px solid var(--tinte)}
+@media(min-width:900px){.kanal-raster{grid-template-columns:repeat(3,1fr)}}
+.kanal{display:grid;gap:var(--s1);padding:var(--s5) var(--s4) var(--s5) 0;border-bottom:1px solid var(--linie);text-decoration:none;min-height:var(--ziel)}
+@media(min-width:900px){.kanal{border-bottom:0;padding:var(--s5) var(--s5)}.kanal:first-child{padding-left:0}.kanal + .kanal{border-left:1px solid var(--linie)}}
+.kanal b{font-family:var(--f-kopf);font-stretch:80%;font-weight:800;font-size:1.75rem;line-height:1}
+.kanal span{color:var(--tinte-2);font-size:1.0625rem}
+@media(hover:hover) and (pointer:fine){.kanal{transition:background-color 160ms ease}.kanal:hover{background:var(--papier-2)}}
+
+.formular-flaeche{background:var(--blatt);border:2px solid var(--tinte);padding:clamp(1.25rem,3.5vw,2.5rem)}
+.formular-flaeche h2{font-size:clamp(1.75rem,3vw,2.25rem);margin-bottom:var(--s2)}
+.feld{margin:0 0 var(--s4)}
+.feld label{display:block;font-family:var(--f-kopf);font-stretch:90%;font-weight:700;font-size:1rem;margin-bottom:var(--s2)}
+.feld input,.feld select,.feld textarea{
+  width:100%;min-height:52px;padding:.7rem .85rem;border:2px solid var(--linie);border-radius:var(--eck);background:var(--papier);color:var(--tinte);
+  font:400 1rem/1.4 var(--f-text);font-size:max(16px,1rem);
+}
+.feld textarea{min-height:120px;resize:vertical}
+.feld input:focus-visible,.feld select:focus-visible,.feld textarea:focus-visible{border-color:var(--tinte);outline-offset:2px}
+.feld input::placeholder,.feld textarea::placeholder{color:var(--tinte-2);opacity:.8}
+.feld-zeile{display:grid;gap:0 var(--s4)}
+@media(min-width:640px){.feld-zeile.zwei{grid-template-columns:1fr 1fr}}
+.feld-hinweis{font-size:1rem;color:var(--tinte-2);margin:0 0 var(--s5)}
+.einwilligung{display:flex;gap:var(--s3);align-items:flex-start;font-size:.9375rem;color:var(--tinte-2);margin:0 0 var(--s5);min-height:var(--ziel)}
+.einwilligung input{width:24px;height:24px;margin:2px 0 0;flex:0 0 auto}
+#formular-meldung{min-height:1.5em;margin:var(--s3) 0 0;font-weight:600}
+#formular-meldung.fehler{color:var(--warnung)}
+#formular-meldung.ok{color:var(--gut)}
+.feld input[aria-invalid="true"]{border-color:var(--warnung)}
+.kontakt-seite{display:grid;gap:var(--s7)}
+@media(min-width:960px){.kontakt-seite{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);align-items:start;gap:clamp(2rem,5vw,4.5rem)}}
+.standort h3{font-size:1.75rem;margin:var(--s5) 0 var(--s3);max-width:20ch}
+.standort ul{list-style:none;display:grid;gap:var(--s3);margin:0 0 var(--s5)}
+.standort li{display:flex;gap:var(--s3);align-items:flex-start}
+.standort li svg{width:22px;height:22px;margin-top:3px;flex:0 0 auto}
+
+/* ============================================================
+   Über uns: Porträt-Platzhalter und Zitat
+   ============================================================ */
+.ueber-raster{display:grid;gap:var(--s6) clamp(2rem,5vw,4.5rem)}
+@media(min-width:900px){.ueber-raster{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);align-items:start}}
+.portraet{aspect-ratio:4/5;border:2px dashed var(--linie);background:var(--blatt);display:grid;place-content:center;gap:var(--s3);text-align:center;padding:var(--s5)}
+.portraet svg{width:44px;height:44px;margin:0 auto;color:var(--tinte-2)}
+.portraet p{margin:0 auto;color:var(--tinte-2);max-width:26ch;font-size:1rem}
+.zitat{font-family:var(--f-kopf);font-stretch:80%;font-weight:760;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.2;max-width:24ch;margin:var(--s6) 0 var(--s2);padding-top:var(--s4);border-top:3px solid var(--tinte)}
+.zitat-urheber{font-size:1rem;color:var(--tinte-2);margin:0 0 var(--s6)}
+.gebiet-raster{display:grid;gap:var(--s7) clamp(2rem,5vw,4.5rem);align-items:center}
+@media(min-width:900px){.gebiet-raster{grid-template-columns:repeat(2,1fr)}}
+.einsatzkreis{margin:0;max-width:520px;justify-self:center;width:100%}
+.einsatzkreis svg{width:100%;height:auto}
+.einsatzkreis figcaption{margin-top:var(--s2);font-size:.9375rem;color:var(--tinte-2);text-align:center}
+
+/* ============================================================
+   Abschluss und Fuß
+   ============================================================ */
+.abschluss{padding:var(--abschnitt) 0}
+.abschluss h2{font-size:clamp(2.75rem,8vw,6.5rem);font-stretch:72%;font-weight:840;line-height:1.02;max-width:12ch;color:var(--papier);word-spacing:.06em}
+.abschluss p{max-width:44ch;margin:var(--s5) 0 var(--s6);font-size:1.1875rem}
+footer.fuss{background:var(--tinte);color:var(--tinte-hell);padding:var(--s8) 0 var(--s7);border-top:1px solid rgba(243,246,242,.28);font-size:1rem}
+footer.fuss .spalten{display:grid;gap:var(--s7)}
+@media(min-width:900px){footer.fuss .spalten{grid-template-columns:1.5fr 1fr 1fr 1fr;gap:var(--s6)}}
+footer.fuss b.titel{display:block;font-family:var(--f-kopf);font-stretch:84%;font-weight:760;font-size:1.1875rem;color:var(--papier);margin-bottom:var(--s3)}
+footer.fuss a{display:flex;align-items:center;min-height:var(--ziel);min-width:var(--ziel);color:var(--tinte-hell);text-decoration:none;width:fit-content}
+footer.fuss .anschrift a{text-decoration:underline}
+footer.fuss .anschrift strong{color:var(--papier);display:block;font-family:var(--f-kopf);font-stretch:80%;font-size:1.4rem;margin-bottom:var(--s2)}
+footer.fuss .claim{margin-top:var(--s4);color:var(--papier);font-family:var(--f-kopf);font-stretch:88%;font-weight:700;max-width:28ch;display:block}
+@media(hover:hover) and (pointer:fine){footer.fuss a:hover{color:var(--papier);text-decoration:underline}}
+.rechtszeile{margin-top:var(--s7);padding-top:var(--s4);border-top:1px solid rgba(243,246,242,.28);display:flex;flex-wrap:wrap;gap:0 var(--s5);align-items:center;font-size:.9375rem}
+.rechtszeile a{display:inline-flex;margin:0}
+.rechtszeile span{flex:1 1 320px;min-height:var(--ziel);display:flex;align-items:center}
+
+/* ============================================================
+   Bewegung: eine Spur, die sich einmal zeichnet, sonst Rückmeldung
+   ============================================================ */
+.sb-spur,.sb-ereignis{stroke-dasharray:1;stroke-dashoffset:0}
+@media(prefers-reduced-motion:no-preference){
+  .sb-spur{animation:zeichnen 1500ms var(--ease-aus) 250ms both}
+  .sb-spur.nach{animation:zeichnen 700ms var(--ease-aus) 1800ms both}
+  .sb-weg{animation:einblenden 600ms ease 900ms both}
+  .sb-ereignis{animation:zeichnen 320ms var(--ease-aus) 1500ms both}
+  .sb-punkt{animation:aufsetzen 360ms var(--ease-aus) 1700ms both;transform-box:fill-box;transform-origin:center}
+  .sb-wort{animation:einblenden 300ms ease 1900ms both}
+  @keyframes zeichnen{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+  @keyframes einblenden{from{opacity:0}to{opacity:1}}
+  @keyframes aufsetzen{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+}
+
+/* Inhalte erscheinen beim Erreichen; ohne Skript sind sie einfach da */
+html.js [data-einsetzen]{opacity:0;transform:translateY(12px);transition:opacity 500ms var(--ease-aus),transform 500ms var(--ease-aus)}
+html.js [data-einsetzen][data-eingesetzt="true"]{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  html.js [data-einsetzen]{transform:none;transition:opacity 180ms ease}
+  .mobilmenue{transform:none;opacity:0;transition:opacity 180ms ease,visibility 0s 180ms}
+  .mobilmenue[data-offen="true"]{opacity:1;transition-delay:0s}
+  .knopf:active,.fussleiste a:active,.filter-leiste button:active{transform:none}
+  .dropdown{transform:none}
+}
+
+@media(prefers-contrast:more){
+  :root{--linie:#3A544B;--linie-fein:#6E8A7D;--tinte-2:#1F3A31}
+  .druckfoto img{mix-blend-mode:normal}
+}
+@media print{
+  .notleiste,header.kopf,.fussleiste,.mobilmenue,.abschluss,.knoepfe{display:none!important}
+  body{background:#fff;color:#000}
+}
+
+@media(max-width:600px){.sb-zahl{font-size:28px}.sb-wort{font-size:30px;stroke-width:8px}.ek-ort{font-size:26px;stroke-width:8px}}
