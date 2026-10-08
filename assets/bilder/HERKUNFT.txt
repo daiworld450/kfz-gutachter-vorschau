@@ -3,11 +3,14 @@ Bilder dieser Seite: Herkunft, Lizenz, Verarbeitung (Stand 06.10.2026, Layout-Pl
 Alle Bilder sind Platzhalter fuer die Layout-Ansicht und vor dem Livegang durch eigene, echte Fotos zu ersetzen.
 Verarbeitung auf der Seite: Graustufen und Screen-Blend per CSS, die Dateien selbst sind unveraendert.
 
-leistung-allgemein.jpg   Pexels (diverse Fotografen), Pexels-Lizenz: kostenlos, Namensnennung nicht verpflichtend
-leistung-elektro.jpg     Pexels (diverse Fotografen), Pexels-Lizenz
-leistung-gebraucht.jpg   Pexels (diverse Fotografen), Pexels-Lizenz
-leistung-oldtimer.jpg    Pexels (diverse Fotografen), Pexels-Lizenz
-leistung-unfall.jpg      Pexels (diverse Fotografen), Pexels-Lizenz
+leistung-allgemein.jpg   Pexels (diverse Fotografen), Pexels-Lizenz: kostenlos, Namensnennung nicht verpflichtend. NICHT MEHR EINGEBUNDEN (Review-Fix 7, 08.10.2026)
+leistung-elektro.jpg     Pexels (diverse Fotografen), Pexels-Lizenz. NICHT MEHR EINGEBUNDEN
+leistung-gebraucht.jpg   Pexels (diverse Fotografen), Pexels-Lizenz. NICHT MEHR EINGEBUNDEN
+leistung-oldtimer.jpg    Pexels (diverse Fotografen), Pexels-Lizenz. NICHT MEHR EINGEBUNDEN
+leistung-unfall.jpg      Pexels (diverse Fotografen), Pexels-Lizenz. NICHT MEHR EINGEBUNDEN
+
+Die fuenf Leistungsseiten (Unfallgutachten, Wertgutachten, Oldtimer, Elektro, Gebrauchtwagen-Check) zeigen stattdessen einen
+ruhigen Foto-Platzhalter ("Foto folgt", Inline-SVG, bauen.py: foto_platzhalter()). Die Dateien bleiben liegen und koennen entfallen.
 
 stadt-muelheim.jpg       Aquarius Wassermuseum, Tuxyso / Wikimedia Commons, CC BY-SA 3.0 (Nennung Pflicht)
 stadt-essen.jpg          Zeche Zollverein, Thomas Wolf, www.foto-tw.de, Wikimedia Commons, CC BY-SA 3.0 DE (Nennung Pflicht)
